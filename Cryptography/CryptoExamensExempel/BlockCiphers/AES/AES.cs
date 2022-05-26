@@ -11,8 +11,9 @@ namespace CryptoExamensExempel.BlockCiphers.AES
 {
     public class AES
     {
-        const string path = @"C:\Users\menta\Source\Repos\CryptoExamens\Cryptography\CryptoExamensExempel\LOTR.txt";
+        string path = File.ReadAllText(@"C:\Users\menta\Source\Repos\CryptoExamens\Cryptography\CryptoExamensExempel\LOTR.txt"); //'Path' är egentligen filen (Cleartext)
         
+
         public string EncryptAes(int oneortwo)
         {
             Stopwatch sw = Stopwatch.StartNew();
@@ -21,19 +22,19 @@ namespace CryptoExamensExempel.BlockCiphers.AES
 
             sw.Start();
 
-            using(Aes aes = Aes.Create())
+            using(Aes aes = Aes.Create()) // OBS! Man kan ej separera Encrypted och Decrypted om dem inte använder sig av samma Key och IV!
             {
                 encrypted = EncryptStringToBytes(path, aes.Key, aes.IV);
                 decrypted = DecryptStringFromBytes(encrypted, aes.Key, aes.IV);
             }
             sw.Stop();
 
-            if (oneortwo == 1) 
+            if (oneortwo == 1) //Om du vill ha Encrypterad Text, skriv Console.Write(test.EncryptAes(1)) i Program.cs!
             {
-                return $"AES Encryption Time: {sw.ElapsedMilliseconds}";
+                return $"AES Encryption & Decryption Time: {sw.ElapsedMilliseconds} \n AES Encryption Desc: {System.Text.Encoding.Default.GetString(encrypted)}"; //Encrypted är fortfarande bytes.
             }
-            else
-            return $"AES Decrypted File: {decrypted}";
+            else //Om du vill ha Decrypted Text, skriv Console.Write(test.EncryptAes(2)) i Program.cs!
+            return $"AES Encryption & Decryption Time: {sw.ElapsedMilliseconds} \n Decrypted Text: {decrypted}";
         }
 
         private static byte[] EncryptStringToBytes(string plainText, byte[] key, byte[] iv)
