@@ -11,29 +11,35 @@ namespace CryptoExamensExempel.BlockCiphers.AES
 {
     public class AES
     {
-        const string path = @"C:\ExamenCrypto\CryptoExamens\Cryptography\CryptoExamensExempel\LOTR.txt";
-
-        public byte[] EncryptAes()
+        const string path = @"C:\Users\menta\Source\Repos\CryptoExamens\Cryptography\CryptoExamensExempel\LOTR.txt";
+        
+        public string EncryptAes(int oneortwo)
         {
             Stopwatch sw = Stopwatch.StartNew();
             byte[] encrypted;
-            
+            string decrypted;
+
             sw.Start();
 
             using(Aes aes = Aes.Create())
             {
                 encrypted = EncryptStringToBytes(path, aes.Key, aes.IV);
+                decrypted = DecryptStringFromBytes(encrypted, aes.Key, aes.IV);
             }
-
             sw.Stop();
-            Console.WriteLine(sw.ElapsedMilliseconds);
-            return encrypted;
+
+            if (oneortwo == 1) 
+            {
+                return $"AES Encryption Time: {sw.ElapsedMilliseconds}";
+            }
+            else
+            return $"AES Decrypted File: {decrypted}";
         }
 
-        private static byte[] EncryptStringToBytes(string original, byte[] key, byte[] iv)
+        private static byte[] EncryptStringToBytes(string plainText, byte[] key, byte[] iv)
         {
-            if (original == null || original.Length <= 0)
-                throw new ArgumentNullException("original");
+            if (plainText == null || plainText.Length <= 0)
+                throw new ArgumentNullException("plainText");
             if (key == null || key.Length <= 0)
                 throw new ArgumentNullException("key");
             if (iv == null || iv.Length <= 0)
@@ -54,56 +60,57 @@ namespace CryptoExamensExempel.BlockCiphers.AES
                     {
                         using(StreamWriter sw = new StreamWriter(cs))
                         {
-                            sw.Write(original);
+                            sw.Write(plainText);
                         }
 
                         encrypted = ms.ToArray();
                     }
                 }
             }
-
             return encrypted;
         }
 
-
-
-
-        // Work in progress
-        public static void AesEncrypt()
+        static string DecryptStringFromBytes(byte[] cipherText, byte[] Key, byte[] IV)
         {
-            //var path = @"C:\ExamenCrypto\CryptoExamens\Cryptography\CryptoExamensExempel\LOTR.txt";
-            var sw = new Stopwatch();
+            // Check arguments.
+            if (cipherText == null || cipherText.Length <= 0)
+                throw new ArgumentNullException("cipherText");
+            if (Key == null || Key.Length <= 0)
+                throw new ArgumentNullException("Key");
+            if (IV == null || IV.Length <= 0)
+                throw new ArgumentNullException("IV");
 
-            using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
+            // Declare the string used to hold
+            // the decrypted text.
+            string plaintext = null;
+
+            // Create an Aes object
+            // with the specified key and IV.
+            using (Aes aesAlg = Aes.Create())
             {
-                using (Aes aes = Aes.Create())
-                {                   
-                    var rnd = RandomNumberGenerator.Create();
-                    byte[] keyByteArray = new byte[16];
-                    //rnd.NextBytes(keyByteArray);
-                    rnd.GetBytes(keyByteArray);
-                    var keyString = Encoding.UTF8.GetString(keyByteArray, 0, keyByteArray.Length);
-                    //Console.WriteLine("Nycekln i form av en 'byte array':   " + keyString);
+                aesAlg.Key = Key;
+                aesAlg.IV = IV;
 
-                    aes.Key = keyByteArray;
-                    byte[] iv = aes.IV;
+                // Create a decryptor to perform the stream transform.
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
 
-                    fs.Write(iv, 0, iv.Length);
-
-                    using (CryptoStream cs = new CryptoStream(fs, aes.CreateEncryptor(), CryptoStreamMode.Write))
+                // Create the streams used for decryption.
+                using (MemoryStream msDecrypt = new MemoryStream(cipherText))
+                {
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
                     {
-                        using (StreamWriter encryptWriter = new StreamWriter(cs))
+                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
                         {
-                            var cryptoStreamRes = cs.CopyTo;
-                            var result = Encoding.UTF8.GetString(cs.);
-                            encryptWriter.WriteLine("Encrypted AF!");
-                            Console.WriteLine("Result: " + Encoding.UTF8.GetString());
+
+                            // Read the decrypted bytes from the decrypting stream
+                            // and place them in a string.
+                            plaintext = srDecrypt.ReadToEnd();
                         }
                     }
                 }
-
             }
 
+            return plaintext;
         }
     }
 }
