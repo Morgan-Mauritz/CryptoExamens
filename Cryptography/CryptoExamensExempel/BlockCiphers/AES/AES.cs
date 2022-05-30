@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
 using System.Security.Cryptography;
 using System.Diagnostics;
 
@@ -12,7 +8,6 @@ namespace CryptoExamensExempel.BlockCiphers.AES
     public class AES
     {
         string path = File.ReadAllText(@"C:\Users\menta\Source\Repos\CryptoExamens\Cryptography\CryptoExamensExempel\LOTR.txt"); //'Path' är egentligen filen (Cleartext)
-        
 
         public string EncryptAes(int oneortwo)
         {

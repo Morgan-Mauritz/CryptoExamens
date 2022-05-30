@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Collections;
 using System.Diagnostics;
 
@@ -12,7 +7,7 @@ namespace CryptoExamensExempel.StreamCiphers.OneTimePad
     public class OneTimePad
     {
         private byte[] _key { get; set; }
-        private Stopwatch watch { get; set; }
+        
         public OneTimePad(int clearTextLength)
         {
             _key = new byte[clearTextLength];
@@ -22,7 +17,7 @@ namespace CryptoExamensExempel.StreamCiphers.OneTimePad
 
         public (string encryptedString, TimeSpan timer) Encrypt(string clearText)
         {
-            watch = new Stopwatch();
+            var watch = new Stopwatch();
             watch.Start();
             string encryptedString = "";
 
@@ -55,7 +50,7 @@ namespace CryptoExamensExempel.StreamCiphers.OneTimePad
         }
         public (string decryptedString, TimeSpan timer) Decrypt(string encryptedString)
         {
-            watch = new Stopwatch();
+            var watch = new Stopwatch();
             watch.Start();
 
             string decryptedString = "";
