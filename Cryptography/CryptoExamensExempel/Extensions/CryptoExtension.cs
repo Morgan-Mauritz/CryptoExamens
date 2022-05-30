@@ -39,5 +39,12 @@ namespace CryptoExamensExempel.Extensions
             get { return totalMillisecondsDecrypt; }
             set { totalMillisecondsDecrypt += value; }
         }
+
+        public static void Reset()
+        {
+            encryptDecryptLoops = 0;
+            totalMillisecondsEncrypt = 0;
+            totalMillisecondsDecrypt = 0;
+        }
     }
 }

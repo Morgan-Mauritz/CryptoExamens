@@ -4,60 +4,98 @@ using System.Diagnostics;
 
 namespace CryptoExamensExempel.BlockCiphers._3DES
 {
-    public class _3DES
-    {
-        private const string key = "nyckel";
-        
-        public string Encrypt(string plainText)
+    public static class _3DES
+    {   
+        public static (byte[], long, string, long, TimeSpan) TrippleDesCrypto(string plainText)
         {
+            (byte[], long) encrypted;
+            (string, long) decrypted;
+            TimeSpan keyElapsed;
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            stopwatch.Start();
+            using (TripleDES tripDes = TripleDES.Create())
+            {
+                stopwatch.Stop();
+                keyElapsed = stopwatch.Elapsed;
+                Console.WriteLine("Key and IV creation {0}", keyElapsed);
+
+                encrypted = Encrypt(plainText, tripDes.Key, tripDes.IV);
+
+                decrypted = Decrypt(encrypted.Item1, tripDes.Key, tripDes.IV);
+            }
+
+            return (encrypted.Item1, encrypted.Item2, decrypted.Item1, decrypted.Item2, keyElapsed);
+        }
+        
+
+        public static (byte[], long) Encrypt(string plainText, byte[] key, byte[] iv)
+        {
+            byte[] encrypted;
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
             using (var des = TripleDES.Create())
             {
-                des.IV = new byte[8];
-                PasswordDeriveBytes pdb = new PasswordDeriveBytes(key, new byte[0]);
-                des.Key = pdb.CryptDeriveKey("RC2", "MD5", 128, new byte[8]);
+                des.Key = key;
+                des.IV = iv;
 
-                using(MemoryStream ms = new MemoryStream(plainText.Length * 2)){
 
-                    using(CryptoStream encStream = new CryptoStream(ms, des.CreateEncryptor(), CryptoStreamMode.Write))
+                ICryptoTransform encryptor = des.CreateEncryptor(des.Key, des.IV);
+              
+
+                using (MemoryStream ms = new MemoryStream(plainText.Length)){
+
+                    using(CryptoStream encStream = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
                     {
-                        byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
-                        encStream.Write(plainBytes, 0, plainBytes.Length);
-            
-                        encStream.FlushFinalBlock();
-            
-                        byte[] encryptedBytes = new byte[ms.Length];
-                        ms.Position = 0;
-                        ms.Read(encryptedBytes, 0, (int)ms.Length);
-                        
-                        return Convert.ToBase64String(encryptedBytes);
+
+                        using (StreamWriter sw = new StreamWriter(encStream))
+                        {
+                            sw.Write(plainText);
+                        }
+
+                        encrypted = ms.ToArray();
+                
                     }
                 }
-            } 
+            }
+            stopwatch.Stop();
+            Console.WriteLine("Milliseconds to encrypt: " + stopwatch.Elapsed);
+            
+            return (encrypted, stopwatch.ElapsedMilliseconds);
         }
 
-        public string Decrypt(string encryptedBase64)
+        public static (string, long) Decrypt(byte[] cipherText, byte[] key, byte[] iv)
         {
+            string? decryptedPlainText = null;
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+
             using (var des = TripleDES.Create())
             {
-                 des.IV = new byte[8];
-                 PasswordDeriveBytes pdb = new PasswordDeriveBytes(key, new byte[0]);
-                 des.Key = pdb.CryptDeriveKey("RC2", "MD5", 128, new byte[8]);
-                 byte[] encryptedBytes = Convert.FromBase64String(encryptedBase64);
+                des.IV = iv;
+                des.Key = key;
 
-                using(MemoryStream ms = new MemoryStream(encryptedBase64.Length))
+                ICryptoTransform encryptor = des.CreateDecryptor(des.Key, des.IV);
+
+                using (MemoryStream ms = new MemoryStream(cipherText))
                 {
-                    using (CryptoStream decStream = new CryptoStream(ms, des.CreateDecryptor(), CryptoStreamMode.Write))
+                    using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Read))
                     {
-                        decStream.Write(encryptedBytes, 0, encryptedBytes.Length);
-                        decStream.FlushFinalBlock();
-                        byte[] plainBytes = new byte[ms.Length];
-                        ms.Position = 0;
-                        ms.Read(plainBytes, 0, (int)ms.Length);
 
-                        return Encoding.UTF8.GetString(plainBytes);
+                        using (StreamReader sr = new StreamReader(cs))
+                        {
+                            decryptedPlainText = sr.ReadToEnd();
+                        }                        
                     }
                 } 
             }
+
+            stopwatch.Stop();
+            Console.WriteLine("Milliseconds to decrypt: " + stopwatch.Elapsed);
+
+            return (decryptedPlainText, stopwatch.ElapsedMilliseconds);
         }
     
     }

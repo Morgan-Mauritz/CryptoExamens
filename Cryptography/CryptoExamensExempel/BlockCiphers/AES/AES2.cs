@@ -31,7 +31,7 @@ namespace CryptoExamensExempel.BlockCiphers.AES
 
             byte[] encrypted;
 
-            Stopwatch stopWatch = Stopwatch.StartNew();
+            Stopwatch stopwatch = Stopwatch.StartNew();
 
             using (Aes aesEncrypt = Aes.Create())
             {
@@ -54,11 +54,11 @@ namespace CryptoExamensExempel.BlockCiphers.AES
                 }
             }
 
-            stopWatch.Stop();
+            stopwatch.Stop();
 
-            Console.WriteLine("Milliseconds to encrypt: " + stopWatch.Elapsed);
+            Console.WriteLine("Milliseconds to encrypt: " + stopwatch.Elapsed);
 
-            return (encrypted, stopWatch.ElapsedMilliseconds);
+            return (encrypted, stopwatch.ElapsedMilliseconds);
         }
 
         private static (string, long) DecryptStringFromBytes(byte[] cipherText, byte[] key, byte[] iv)
@@ -72,7 +72,7 @@ namespace CryptoExamensExempel.BlockCiphers.AES
 
             string? decryptedPlainText = null;
 
-            Stopwatch stopWatch = Stopwatch.StartNew();
+            Stopwatch stopwatch = Stopwatch.StartNew();
 
             using (Aes aesAlg = Aes.Create())
             {
@@ -93,9 +93,9 @@ namespace CryptoExamensExempel.BlockCiphers.AES
                 }
             }
 
-            stopWatch.Stop();
-            Console.WriteLine("Milliseconds to decrypt: " + stopWatch.Elapsed);
-            return (decryptedPlainText, stopWatch.ElapsedMilliseconds);
+            stopwatch.Stop();
+            Console.WriteLine("Milliseconds to decrypt: " + stopwatch.Elapsed);
+            return (decryptedPlainText, stopwatch.ElapsedMilliseconds);
         }
     }
 }
