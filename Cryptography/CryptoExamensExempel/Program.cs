@@ -8,10 +8,29 @@ using System.Text;
 
 var baseDirectory = Directory.GetCurrentDirectory();
 var workingDirectory = Directory.GetParent(baseDirectory).Parent.Parent.FullName;
-var plainText = File.ReadAllText($"{workingDirectory}/LOTR.txt");
+
+using (var fs = new FileStream(workingDirectory + "/dummy16.txt", FileMode.Create, FileAccess.Write, FileShare.None))
+{
+    fs.SetLength(16000000);
+}
+using (var fs = new FileStream(workingDirectory + "/dummy32.txt", FileMode.Create, FileAccess.Write, FileShare.None))
+{
+    fs.SetLength(32000000);
+}
+using (var fs = new FileStream(workingDirectory + "/dummy64.txt", FileMode.Create, FileAccess.Write, FileShare.None))
+{
+    fs.SetLength(64000000);
+}
+using (var fs = new FileStream(workingDirectory + "/dummy128.txt", FileMode.Create, FileAccess.Write, FileShare.None))
+{
+    fs.SetLength(128000000);
+}
+
+var plainText = File.ReadAllText($"{workingDirectory}/dummy128.txt");
 
 
-for (int cryptoLoops = 0; cryptoLoops < 50; cryptoLoops++)
+
+for (int cryptoLoops = 0; cryptoLoops < 1; cryptoLoops++)
 {
     //Räkna bort första loopen? Outlier.
     var result = _3DES.TrippleDesCrypto(plainText);
@@ -31,7 +50,7 @@ Console.WriteLine("Decryption average milliseconds: {0}", CryptoExtension.Averag
 
 CryptoExtension.Reset();
 
-for (int cryptoLoops = 0; cryptoLoops < 50; cryptoLoops++)
+for (int cryptoLoops = 0; cryptoLoops < 1; cryptoLoops++)
 {
     //Räkna bort första loopen? Outlier.
     var result = AES2.AesCrypto(plainText);
@@ -49,8 +68,8 @@ for (int cryptoLoops = 0; cryptoLoops < 50; cryptoLoops++)
 Console.WriteLine("Encryption average milliseconds: " + CryptoExtension.AverageMillisecondsEncrypt);
 Console.WriteLine("Decryption average milliseconds: " + CryptoExtension.AverageMillisecondsDecrypt);
 
-//// Print encryption
-////var encryption = AES2.AesCrypto(plainText);
-////Console.WriteLine($"Encrypted: {Encoding.UTF8.GetString(encryption.Item1)}");
-////Console.WriteLine("Encrypted: " + string.Join("", encryption.Item1));
-////Console.WriteLine("Decrypted: " + encryption.Item3);
+// Print encryption
+//var encryption = AES2.AesCrypto(plainText);
+//Console.WriteLine($"Encrypted: {Encoding.UTF8.GetString(encryption.Item1)}");
+//Console.WriteLine("Encrypted: " + string.Join("", encryption.Item1));
+//Console.WriteLine("Decrypted: " + encryption.Item3);
