@@ -6,7 +6,7 @@ namespace CryptoExamensExempel.BlockCiphers._3DES
 {
     public static class _3DES
     {   
-        public static (byte[], long, string, long, TimeSpan) TrippleDesCrypto(string plainText)
+        public static (byte[], long, string, long, TimeSpan) TrippleDesCrypto(string plainText, ref List<string> listOfResult)
         {
             (byte[], long) encrypted;
             (string, long) decrypted;
@@ -20,16 +20,16 @@ namespace CryptoExamensExempel.BlockCiphers._3DES
                 keyElapsed = stopwatch.Elapsed;
                 Console.WriteLine("Key and IV creation {0}", keyElapsed);
 
-                encrypted = Encrypt(plainText, tripDes.Key, tripDes.IV);
+                encrypted = Encrypt(plainText, tripDes.Key, tripDes.IV, ref listOfResult);
 
-                decrypted = Decrypt(encrypted.Item1, tripDes.Key, tripDes.IV);
+                decrypted = Decrypt(encrypted.Item1, tripDes.Key, tripDes.IV, ref listOfResult);
             }
 
             return (encrypted.Item1, encrypted.Item2, decrypted.Item1, decrypted.Item2, keyElapsed);
         }
         
 
-        public static (byte[], long) Encrypt(string plainText, byte[] key, byte[] iv)
+        public static (byte[], long) Encrypt(string plainText, byte[] key, byte[] iv, ref List<string> listOfResult)
         {
             byte[] encrypted;
 
@@ -60,12 +60,13 @@ namespace CryptoExamensExempel.BlockCiphers._3DES
                 }
             }
             stopwatch.Stop();
+            listOfResult.Add("Milliseconds to encrypt: " + stopwatch.Elapsed);
             Console.WriteLine("Milliseconds to encrypt: " + stopwatch.Elapsed);
             
             return (encrypted, stopwatch.ElapsedMilliseconds);
         }
 
-        public static (string, long) Decrypt(byte[] cipherText, byte[] key, byte[] iv)
+        public static (string, long) Decrypt(byte[] cipherText, byte[] key, byte[] iv, ref List<string> listOfResult)
         {
             string? decryptedPlainText = null;
 
@@ -93,6 +94,7 @@ namespace CryptoExamensExempel.BlockCiphers._3DES
             }
 
             stopwatch.Stop();
+            listOfResult.Add("Milliseconds to decrypt: " + stopwatch.Elapsed);
             Console.WriteLine("Milliseconds to decrypt: " + stopwatch.Elapsed);
 
             return (decryptedPlainText, stopwatch.ElapsedMilliseconds);

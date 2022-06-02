@@ -5,22 +5,22 @@ namespace CryptoExamensExempel.BlockCiphers.AES
 {
     public static class AES2
     {
-        public static (byte[], long, string, long) AesCrypto(string plainText)
+        public static (byte[], long, string, long) AesCrypto(string plainText, ref List<string> listOfResults)
         {
             (byte[], long) encrypted;
             (string, long) decrypted;
 
             using (Aes aes = Aes.Create())
             {
-                encrypted = EncryptStringToBytes(plainText, aes.Key, aes.IV);
+                encrypted = EncryptStringToBytes(plainText, aes.Key, aes.IV, ref listOfResults);
 
-                decrypted = DecryptStringFromBytes(encrypted.Item1, aes.Key, aes.IV);
+                decrypted = DecryptStringFromBytes(encrypted.Item1, aes.Key, aes.IV, ref listOfResults);
             }
 
             return (encrypted.Item1, encrypted.Item2, decrypted.Item1, decrypted.Item2);
         }
 
-        private static (byte[], long) EncryptStringToBytes(string plainText, byte[] key, byte[] iv)
+        private static (byte[], long) EncryptStringToBytes(string plainText, byte[] key, byte[] iv, ref List<string> listOfResults)
         {
             if (plainText == null || plainText.Length <= 0)
                 throw new ArgumentNullException("plainText");
@@ -55,13 +55,13 @@ namespace CryptoExamensExempel.BlockCiphers.AES
             }
 
             stopwatch.Stop();
-
+            listOfResults.Add("Milliseconds to encrypt: " + stopwatch.Elapsed);
             Console.WriteLine("Milliseconds to encrypt: " + stopwatch.Elapsed);
 
             return (encrypted, stopwatch.ElapsedMilliseconds);
         }
 
-        private static (string, long) DecryptStringFromBytes(byte[] cipherText, byte[] key, byte[] iv)
+        private static (string, long) DecryptStringFromBytes(byte[] cipherText, byte[] key, byte[] iv, ref List<string> listOfResults)
         {
             if (cipherText == null || cipherText.Length <= 0)
                 throw new ArgumentNullException("cipherText");
@@ -94,6 +94,7 @@ namespace CryptoExamensExempel.BlockCiphers.AES
             }
 
             stopwatch.Stop();
+            listOfResults.Add("Milliseconds to decrypt: " + stopwatch.Elapsed);
             Console.WriteLine("Milliseconds to decrypt: " + stopwatch.Elapsed);
             return (decryptedPlainText, stopwatch.ElapsedMilliseconds);
         }
