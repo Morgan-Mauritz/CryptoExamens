@@ -6,7 +6,7 @@ namespace CryptoExamensExempel.BlockCiphers._3DES
 {
     public static class _3DES
     {   
-        public static (byte[], long, string, long, TimeSpan) TrippleDesCrypto(string plainText, ref List<string> listOfResult)
+        public static (byte[], long, string, long, TimeSpan) TripleDesCrypto(string plainText, ref List<string> listOfResult)
         {
             (byte[], long) encrypted;
             (string, long) decrypted;
